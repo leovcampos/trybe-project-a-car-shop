@@ -17,11 +17,11 @@ describe('route /cars tests', function () {
       doorsQty: 2,
       seatsQty: 5,
     };
-    const carRegister = new Car({ ...car, id: '1' });
+    const carRegister = new Car({ id: '1', ...car });
     sinon.stub(Model, 'create').resolves(carRegister);
 
     const sut = new CarService();
-    const result = sut.register(car);
+    const result = await sut.register(car);
 
     expect(result).to.be.deep.equal(carRegister);
   });
@@ -52,7 +52,7 @@ describe('route /cars tests', function () {
     sinon.stub(Model, 'find').resolves(cars);
 
     const sut = new CarService();
-    const result = sut.list();
+    const result = await sut.list();
 
     expect(result).to.be.deep.equal(cars);
   });
@@ -71,14 +71,23 @@ describe('route /cars tests', function () {
     sinon.stub(Model, 'findOne').resolves(car);
 
     const sut = new CarService();
-    const result = sut.findById('634852326b35b59438fbea2f');
+    const result = await sut.findById('634852326b35b59438fbea2f');
 
     expect(result).to.be.deep.equal(car);
   });
 
+  it('if cant find a car with wrong ID', async function () {
+    sinon.stub(Model, 'findOne').resolves(null);
+
+    const sut = new CarService();
+    const result = await sut.findById('634852326b35b59438fbea2f');
+
+    expect(result).to.be.deep.equal(null);
+  });
+
   it('verify function update', async function () {
     const newCar: ICar = {
-      id: '523952326d65c48756dfea5r',
+      id: '634852326b35b59438fbea2f',
       model: 'Fusca',
       year: 1980,
       color: 'Blue',
@@ -93,12 +102,12 @@ describe('route /cars tests', function () {
         matchedCount: 1, 
         modifiedCount: 1, 
         upsertedCount: 0, 
-        upsertedId: new ObjectId('523952326d65c48756dfea5r'),
+        upsertedId: new ObjectId('634852326b35b59438fbea2f'),
       },
     );
 
     const sut = new CarService();
-    const result = await sut.update('523952326d65c48756dfea5r', newCar);
+    const result = await sut.update('634852326b35b59438fbea2f', newCar);
 
     expect(result).to.be.deep.equal(newCar);
   });
